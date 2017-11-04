@@ -1,35 +1,37 @@
-import { createStore, combineReducers } from 'redux'
-import { ADD_EMOJI, SET_NEW_EMOJI } from './constants'
+import { createStore, applyMiddleware, combineReducers } from "redux";
+import thunk from "redux-thunk";
+import { ADD_EMOJI, SET_NEW_EMOJI, SET_EMOJIS } from "./constants";
 
-import { cond, equals, always, T, append } from 'ramda'
+import { cond, equals, always, T, append, uniq } from "ramda";
 export default createStore(
   combineReducers({
     emojis,
     newemoji
-  })
-)
+  }),
+  applyMiddleware(thunk)
+);
 
 function emojis(state = [], action) {
   return cond([
     [
-      equals(ADD_EMOJI),
+      equals(SET_EMOJIS),
       () => {
-        return append(action.payload, state)
+        return action.payload;
       }
     ],
     [T, always(state)]
-  ])(action.type)
+  ])(action.type);
 }
 
-function newemoji(state = '', action) {
+function newemoji(state = "", action) {
   return cond([
-    [equals(ADD_EMOJI), always('')],
+    [equals(SET_EMOJIS), always("")],
     [
       equals(SET_NEW_EMOJI),
       () => {
-        return action.payload
+        return action.payload;
       }
     ],
     [T, always(state)]
-  ])(action.type)
+  ])(action.type);
 }
